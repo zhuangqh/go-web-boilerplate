@@ -1,31 +1,26 @@
 package db
 
 import (
-    "gopkg.in/mgo.v2"
-    "time"
-    "log"
     "github.com/zhuangqh/go-web-boilerplate/config"
+    _ "github.com/jinzhu/gorm/dialects/mysql"
+    "github.com/jinzhu/gorm"
+    "log"
+    "fmt"
+    "os"
 )
 
-var MgoSession *mgo.Session
-var Database string
+var DB *gorm.DB
 
 func init() {
-    Database = config.Conf.Database
-
-    mgoDBDialInfo := &mgo.DialInfo{
-        Addrs:    []string{config.Conf.DBConf.Host},
-        Username:  config.Conf.DBConf.Username,
-        Password:  config.Conf.DBConf.Password,
-        Timeout:  30 * time.Second,
-        Database: config.Conf.Database,
-    }
+    connPath := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+        config.Conf.Username, config.Conf.Password, config.Conf.Database)
 
     var err error
-    MgoSession, err = mgo.DialWithInfo(mgoDBDialInfo)
+    DB, err = gorm.Open("mysql", connPath)
     if err != nil {
-        log.Fatalf("cannot dial mongodb: %s\n", err)
+        log.Fatalf("cannot dial database: %s\n", err)
+        os.Exit(1)
     }
 
-    MgoSession.SetMode(mgo.Monotonic, true)
+    // DB.LogMode(true)
 }

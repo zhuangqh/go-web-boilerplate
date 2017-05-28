@@ -1,9 +1,9 @@
 {
   "db": {
     "host": "localhost",
-    "username": "",
+    "username": "root",
     "password": "",
-    "database": "wxpro"
+    "database": "example"
   },
   "host": "http://localhost/upload",
   "port": ":8080",

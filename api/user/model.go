@@ -2,16 +2,14 @@ package user
 
 import (
     "github.com/asaskevich/govalidator"
-    "gopkg.in/mgo.v2/bson"
-    "time"
-    "github.com/zhuangqh/go-web-boilerplate/db"
+    . "github.com/zhuangqh/go-web-boilerplate/db"
 )
 
 const ModelName = "user"
 
 type Param struct {
-    Name         string          `bson:"name"          json:"name"         valid:"runelength(1|100),required"`
-    HeadImgUrl   string          `bson:"head_img_url"  json:"head_img_url" valid:"url"`
+    Name         string          `json:"name"         valid:"runelength(1|100),required"`
+    HeadImgUrl   string          `json:"head_img_url" valid:"url"`
 }
 
 func (param *Param) Validate() (bool, error) {
@@ -19,54 +17,44 @@ func (param *Param) Validate() (bool, error) {
 }
 
 type Model struct {
-    ID           bson.ObjectId   `bson:"_id,omitempty" json:"_id"`
-    Param `bson:",inline"`
-    Time         time.Time       `bson:"time"          json:"time"`
-    Deleted      bool            `bson:"deleted"       json:"-"`
+    BasicModel
+    Param
 }
 
-func newOne(param *Param) *Model {
-    return &Model{
-        ID: bson.NewObjectId(),
+func (Model) TableName() string {
+    return ModelName
+}
+
+func init() {
+    DB.AutoMigrate(&Model{})
+}
+
+/**
+ * methods
+ */
+
+func GetMany() ([]*Model, *OPError) {
+    var objs []*Model
+
+    DB.Find(&objs)
+
+    return objs, nil
+}
+
+func CreateOne(param *Param) (*Model, *OPError) {
+    if res, err := param.Validate(); !res {
+        return nil, &OPError{400, err}
+    }
+
+    obj := Model{
         Param: *param,
-        Time: time.Now(),
-        Deleted: false,
     }
-}
 
-func GetMany() ([]*Model, *db.OPError) {
-    db.MgoSession = db.MgoSession.Clone()
-    defer db.MgoSession.Close()
-
-    coll := db.MgoSession.DB(db.Database).C(ModelName)
-
-    var data []*Model
-    err := coll.Find(nil).All(&data)
+    err := DB.Create(&obj).Error
 
     if err != nil {
-        return data, &db.OPError{200, err}
+        return nil, &OPError{500, err}
     }
 
-    return data, nil
-}
-
-func CreateOne(param *Param) (*Model, *db.OPError) {
-    if res, err := param.Validate(); res == false {
-        return nil, &db.OPError{400, err}
-    }
-
-    obj := newOne(param)
-
-    db.MgoSession = db.MgoSession.Clone()
-    defer db.MgoSession.Close()
-
-    coll := db.MgoSession.DB(db.Database).C(ModelName)
-
-    err := coll.Insert(obj)
-
-    if err != nil {
-        return nil, &db.OPError{500, err}
-    }
-
-    return obj, nil
+    return &obj, nil
 }
