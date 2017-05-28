@@ -1,0 +1,14 @@
+<seelog minlevel="info">
+    <outputs formatid="common">
+        <console formatid="colored"/>
+        <rollingfile type="size" filename="./logs/roll_dev.log" maxsize="100000" maxrolls="5"/>
+        <filter levels="critical">
+            <file path="./logs/critical_dev.log" formatid="critical"/>
+        </filter>
+    </outputs>
+    <formats>
+        <format id="common" format="[%LEV] %Date/%Time %Msg%n" />
+        <format id="critical" format="%Date/%Time %File %FullPath %Func %Msg%n" />
+        <format id="colored"  format="%EscM(32)[%Level]%EscM(0) %Msg%n"/>
+    </formats>
+</seelog>

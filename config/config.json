@@ -1,0 +1,13 @@
+{
+  "db": {
+    "host": "localhost",
+    "username": "",
+    "password": "",
+    "database": "wxpro"
+  },
+  "host": "http://localhost/upload",
+  "port": ":8080",
+  "log": "config/log_dev.xml",
+  "static": "./upload",
+  "api_prefix": "/apt"
+}

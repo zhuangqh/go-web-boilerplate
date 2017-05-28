@@ -1,0 +1,18 @@
+<seelog minlevel="info">
+    <outputs formatid="common">
+        <filter levels="info">
+            <rollingfile formatid="common" type="date" filename="./logs/info_prod.log" datepattern="01.01.2017" maxrolls="30"/>
+        </filter>
+        <filter levels="error">
+            <rollingfile formatid="common" type="size" filename="./logs/roll_prod.log" maxsize="100000" maxrolls="30"/>
+        </filter>
+        <filter levels="critical">
+            <file path="./logs/critical_prod.log" formatid="critical"/>
+        </filter>
+    </outputs>
+    <formats>
+        <format id="common" format="%Date/%Time %Msg%n" />
+        <format id="critical" format="%Date/%Time %File %FullPath %Func %Msg%n" />
+        <format id="colored"  format="%EscM(46)%Level%EscM(49) %Msg%n%EscM(0)"/>
+    </formats>
+</seelog>
